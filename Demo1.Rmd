@@ -5,7 +5,7 @@ output: pdf_document
 
 First we will load the package:
 
-```{r, warning = FALSE}
+```{r, warning = FALSE, message = FALSE}
 # load the package
 library(eDNAjoint)
 
