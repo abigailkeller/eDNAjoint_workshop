@@ -303,8 +303,75 @@ salinity_plot <- ggplot(data = p11_salinity) +
 filtertime_plot + salinity_plot + plot_layout(nrow = 1)
 ```
 
-
 # Compare detection rates
+
+To compare the relative sensitivity of eDNA and traditional sampling, we can use `detection_calculate()` to find the units of survey effort necessary to detect presence of the species. 
+
+Here, detecting presence refers to producing at least one true positive eDNA detection or catching at least one individual in a traditional survey.
+
+This is calculated for an average site:
+
+$$
+\beta_i = \alpha_1 + \alpha_2 \times FilterTime_i + \alpha_3 \times Salinity_i
+$$
+$$
+\beta_i = \alpha_1 + \alpha_2 \times 0 + \alpha_3 \times 0
+$$
+
+```{r}
+detection_calculate(goby_fit_cov1$model, # model fit
+                    mu = c(0.1, 0.5, 1), # expected catch rate
+                    cov_val = c(0, 0), # mean covariate values
+                    probability = 0.9) # probability of detection
+```
+
+How does this change if we do not calculate for a site with mean covariate values?
+
+This is calculating the effort necessary to detect presence for a site with a filter time 0.5 z-scores above the mean:
+
+$$
+\beta_i = \alpha_1 + \alpha_2 \times 0.5 + \alpha_3 \times 0
+$$
+
+```{r}
+detection_calculate(goby_fit_cov1$model, 
+                    mu = c(0.1, 0.5, 1),
+                    cov_val = c(0.5, 0), # filter time 0.5 z-scores above the mean
+                    probability = 0.9)
+```
+
+Now let's do the same for salinity:
+
+$$
+\beta_i = \alpha_1 + \alpha_2 \times 0 + \alpha_3 \times 0.5
+$$
+
+```{r}
+detection_calculate(goby_fit_cov1$model, 
+                    mu = c(0.1, 0.5, 1),
+                    cov_val = c(0, 0.5), # filter time 0.5 z-scores above the mean
+                    probability = 0.9)
+```
+
+We can plot these comparisons as well with `detection_plot()`:
+
+```{r}
+detection_plot(goby_fit_cov1$model, 
+               mu_min = 0.1, mu_max = 1, # min and max mu
+               cov_val = c(0, 0), # mean covariate values
+               probability = 0.9)
+```
+
+And now plot for a site with filter time 0.5 z-scores above the mean:
+
+```{r}
+detection_plot(goby_fit_cov1$model, 
+               mu_min = 0.1, mu_max = 1, # min and max mu
+               cov_val = c(0.5, 0), # high salinity
+               probability = 0.9)
+```
+
+
 
 # Priors
 
