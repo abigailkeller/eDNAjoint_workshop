@@ -8,9 +8,12 @@ First we will load the package:
 ```{r, warning = FALSE}
 # load the package
 library(eDNAjoint)
+
+# and other packages used in this workshop
 library(tidyverse)
 library(bayestestR)
 library(patchwork)
+library(wesanderson)
 ```
 
 # Prepare the data
@@ -371,9 +374,101 @@ detection_plot(goby_fit_cov1$model,
                probability = 0.9)
 ```
 
+# Prior sensitivity analysis
 
+When we first fit our model, we used the default prior distribution for $p10$, the probability of a false positive eDNA detection:
 
-# Priors
+```{r}
+# run the joint model with two covariates
+goby_fit_cov1 <- joint_model(
+  data = goby_data,
+  cov = c("Filter_time", "Salinity"), 
+  family = "poisson",
+  p10_priors = c(1, 20), # specify prior distribution for p10
+  q = FALSE,
+  multicore = TRUE 
+)
+```
 
+These are the shape parameters of a beta distribution that reflects our prior belief about the probability of a false positive. And this prior belief is updated with our data to give use our posterior estimate.
 
+The default parameters give us a prior for p10 that is relatively uninformative:
 
+```{r}
+p10_prior <- rbeta(10000, shape1 = 1, shape2 = 20)
+
+ggplot() +
+  geom_histogram(aes(x = p10_prior)) +
+  theme_minimal()
+```
+
+With this prior, 99% of the probability density is less than 0.2.
+
+```{r}
+1 - qbeta(0.2, shape1 = 1, shape2 = 20)
+```
+
+We could keep this prior relatively uninformative, or we could use data to create the prior, perhaps from negative controls. 
+
+For example, let’s say you used 25 negative qPCR controls during eDNA data processing. You can assume that the probability of a false positive is less than $1 / 25 = 0.04$. To reflect this data, you could create a prior where the $probability(p10 > 0.04)$ is low:
+
+```{r}
+p10_negative_control <- rbeta(n = 10000, shape1 = 1, shape2 = 100)
+
+ggplot() +
+  geom_histogram(aes(x = p10_negative_control)) +
+  labs(x = "p10 prior", y = "count") +
+  theme_minimal()
+```
+
+With an informative prior, it is good practice to do a prior sensitivity analysis. Here, we are testing how sensitive our posterior inference is to the choice of prior.
+
+If the posterior is not sensitive to the prior, this means that the posterior is more driven by the information in the data, rather than by the prior.
+
+So we could run our model again with different priors:
+
+```{r}
+fit_prior2 <- joint_model(data = goby_data, family = "poisson",
+                          cov = c("Filter_time", "Salinity"),
+                          p10_priors = c(1, 15), # new prior
+                          q = FALSE, verbose = FALSE,
+                          multicore = TRUE)
+```
+```{r}
+fit_prior3 <- joint_model(data = goby_data, family = "poisson",
+                          cov = c("Filter_time", "Salinity"),
+                          p10_priors = c(1, 10), # new prior
+                          q = FALSE, verbose = FALSE,
+                          multicore = TRUE)
+```
+
+```{r, warning = FALSE, message = FALSE}
+# get samples
+samples_20 <- rstan::extract(goby_fit_cov1$model, pars = "p10")$p10
+samples_10 <- rstan::extract(fit_prior2$model, pars = "p10")$p10
+samples_30 <- rstan::extract(fit_prior3$model, pars = "p10")$p10
+
+# plot
+prior_plot <- ggplot() +
+  geom_density(aes(x = rbeta(100000, 1, 20)), color = wes_palette("Zissou1")[1],
+               linetype = "dashed") + # blue
+  geom_density(aes(x = rbeta(100000, 1, 10)), color = wes_palette("Zissou1")[3],
+               linetype = "dashed") + # yellow
+  geom_density(aes(x = rbeta(100000, 1, 30)), color = wes_palette("Zissou1")[5],
+               linetype = "dashed") + # red
+  scale_x_continuous(limits = c(0, 0.15)) +
+  labs(x = "p10 value", y = "density") +
+  ggtitle("A. p10 prior distribution") +
+  theme_minimal()
+
+posterior_plot <- ggplot() +
+  geom_density(aes(x = samples_20), color = wes_palette("Zissou1")[1]) +
+  geom_density(aes(x = samples_10), color = wes_palette("Zissou1")[3]) +
+  geom_density(aes(x = samples_30), color = wes_palette("Zissou1")[5]) +
+  scale_x_continuous(limits = c(0, 0.15)) +
+  labs(x = "p10 value", y = "density") +
+  ggtitle("B. p10 posterior distribution") +
+  theme_minimal()
+
+prior_plot + posterior_plot + plot_layout(ncol = 2)
+```
