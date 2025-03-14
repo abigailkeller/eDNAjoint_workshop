@@ -106,10 +106,11 @@ Site-level covariate data is totally optional! PCR and count data are the minimu
 ```{r}
 head(goby_data$site_cov)
 ```
+
 Notice that the continuous data is normalized:
 
 ```{r}
-mean(goby_data$site_cov[, "Salinity"])
+round(mean(goby_data$site_cov[, "Salinity"]))
 ```
 
 ```{r}
@@ -160,6 +161,7 @@ And the second element of the list are the initial values used to start the MCMC
 ```{r}
 length(goby_fit_cov1$inits)
 ```
+
 # Model selection
 
 In the first model, we used salinity and filter time as our site level covariates. Perhaps we want to see how this model compares to models that include other covariates.
@@ -177,6 +179,7 @@ goby_fit_cov2 <- joint_model(data = goby_data,
                              verbose = FALSE # don't print messages!
                             )
 ```
+
 And now we will use the `joint_select` function to compare our two models. We will input our two models as a list:
 
 ```{r, message = FALSE, warning = FALSE}
@@ -197,6 +200,7 @@ First let's look at the `p10` parameter:
 ```{r}
 joint_summarize(goby_fit_cov1$model, par = "p10")
 ```
+
 Here, we see the mean, standard deviation, lower and upper bounds of the 95% credibility interval, the effective sample size, and Rhat.
 
 Let's plot this marginal posterior as a density plot:
@@ -251,60 +255,13 @@ So let's look at the marginal posterior summaries of `alpha`:
 ```{r}
 joint_summarize(goby_fit_cov1$model, par = "alpha")
 ```
+
 `alpha[1]` is the regression intercept and indicates the sensitivity of eDNA at the *average* site.
 
 `alpha[2]` is the regression coefficient for filter time. Since this is positive, this means that at sites where the filter time is longer, the sensitivity of eDNA is lower.
 
 `alpha[3]` is the regression coefficient for salinity. Since this is negative, this means that at sites with higher salinity, the sensitivity of eDNA is higher.
 
-And we can go a little farther than this and use the posterior samples and model structure to see the relationship between the value of the covariate and of a true eDNA detection. 
-
-```{r}
-# get posterior samples of site-level covariate coefficients (alpha)
-samples_alpha <- as.data.frame(rstan::extract(goby_fit_cov1$model, 
-                                              pars = "alpha")$alpha)
-colnames(samples_alpha) <- c("alpha1", "alpha2", "alpha3")
-# calculate p11, given mu = 0.1 at a range of covariate values
-cov_val <- seq(-1, 1, 0.05)
-mu <- 0.1
-# filter time
-p11_filtertime <- as.data.frame(matrix(NA, nrow = length(cov_val), ncol = 4))
-colnames(p11_filtertime) <- c("filtertime_z", "p11_mean", "p11_low", "p11_high")
-for (i in seq_along(1:length(cov_val))) {
-  beta <- as.matrix(samples_alpha) %*% c(1, cov_val[i], 0)
-  p11 <- mu / (mu + exp(beta))
-  p11_filtertime[i, ] <- as.vector(c(cov_val[i], mean(p11),
-  ci(p11, method = "HDI")[2:3]))
-}
-
-# salinity
-p11_salinity <- as.data.frame(matrix(NA, nrow = length(cov_val), ncol = 4))
-colnames(p11_salinity) <- c("salinity_z", "p11_mean", "p11_low", "p11_high")
-for (i in seq_along(1:length(cov_val))) {
-  beta <- as.matrix(samples_alpha) %*% c(1, 0, cov_val[i])
-  p11 <- mu / (mu + exp(beta))
-  p11_salinity[i, ] <- as.vector(c(cov_val[i], mean(p11),
-  ci(p11, method = "HDI")[2:3]))
-}
-# plot
-filtertime_plot <- ggplot(data = p11_filtertime) +
-  geom_ribbon(aes(x = filtertime_z, 
-                  ymin = p11_low, ymax = p11_high), fill = "grey70") +
-  geom_line(aes(x = filtertime_z, y = p11_mean)) +
-  labs(x = "filter time (normalized)", y = "p11") +
-  theme_minimal() +
-  ggtitle("A.")
-
-salinity_plot <- ggplot(data = p11_salinity) +
-  geom_ribbon(aes(x = salinity_z,
-                  ymin = p11_low, ymax = p11_high), fill = "grey70") +
-  geom_line(aes(x = salinity_z, y = p11_mean)) +
-  labs(x = "salinity (normalized)", y = "p11") +
-  theme_minimal() +
-  ggtitle("B.")
-
-filtertime_plot + salinity_plot + plot_layout(nrow = 1)
-```
 
 # Compare detection rates
 
@@ -352,7 +309,7 @@ $$
 ```{r}
 detection_calculate(goby_fit_cov1$model, 
                     mu = c(0.1, 0.5, 1),
-                    cov_val = c(0, 0.5), # filter time 0.5 z-scores above the mean
+                    cov_val = c(0, 0.5), # salinity 0.5 z-scores above the mean
                     probability = 0.9)
 ```
 
@@ -370,7 +327,7 @@ And now plot for a site with filter time 0.5 z-scores above the mean:
 ```{r}
 detection_plot(goby_fit_cov1$model, 
                mu_min = 0.1, mu_max = 1, # min and max mu
-               cov_val = c(0.5, 0), # high salinity
+               cov_val = c(0.5, 0), # high filter time
                probability = 0.9)
 ```
 
@@ -399,6 +356,7 @@ p10_prior <- rbeta(10000, shape1 = 1, shape2 = 20)
 
 ggplot() +
   geom_histogram(aes(x = p10_prior)) +
+  labs(x = "p10 prior", y = "") +
   theme_minimal()
 ```
 
@@ -434,13 +392,35 @@ fit_prior2 <- joint_model(data = goby_data, family = "poisson",
                           q = FALSE, verbose = FALSE,
                           multicore = TRUE)
 ```
+
 ```{r}
 fit_prior3 <- joint_model(data = goby_data, family = "poisson",
                           cov = c("Filter_time", "Salinity"),
-                          p10_priors = c(1, 10), # new prior
+                          p10_priors = c(1, 25), # new prior
                           q = FALSE, verbose = FALSE,
                           multicore = TRUE)
 ```
+
+And then compare the posteriors of `p10`:
+
+Model 1:
+
+```{r}
+joint_summarize(goby_fit_cov1$model, par = "p10")
+```
+
+Model 2:
+
+```{r}
+joint_summarize(fit_prior2$model, par = "p10")
+```
+
+Model 3:
+
+```{r}
+joint_summarize(fit_prior3$model, par = "p10")
+```
+
 
 ```{r, warning = FALSE, message = FALSE}
 # get samples
