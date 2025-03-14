@@ -1,0 +1,738 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\documentclass[
+]{article}
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Demo 1: Endangered tidewater gobies},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Demo 1: Endangered tidewater gobies}
+\author{}
+\date{\vspace{-2.5em}}
+
+\begin{document}
+\maketitle
+
+First we will load the package:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# load the package}
+\FunctionTok{library}\NormalTok{(eDNAjoint)}
+\FunctionTok{library}\NormalTok{(tidyverse)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## -- [1mAttaching core tidyverse packages[22m ------------------------ tidyverse 2.0.0 --
+## [32mv[39m [34mdplyr    [39m 1.1.4     [32mv[39m [34mreadr    [39m 2.1.5
+## [32mv[39m [34mforcats  [39m 1.0.0     [32mv[39m [34mstringr  [39m 1.5.1
+## [32mv[39m [34mggplot2  [39m 3.5.1     [32mv[39m [34mtibble   [39m 3.2.1
+## [32mv[39m [34mlubridate[39m 1.9.4     [32mv[39m [34mtidyr    [39m 1.3.1
+## [32mv[39m [34mpurrr    [39m 1.0.2     
+## -- [1mConflicts[22m ------------------------------------------ tidyverse_conflicts() --
+## [31mx[39m [34mdplyr[39m::[32mfilter()[39m masks [34mstats[39m::filter()
+## [31mx[39m [34mdplyr[39m::[32mlag()[39m    masks [34mstats[39m::lag()
+## [36mi[39m Use the conflicted package ([3m[34m<http://conflicted.r-lib.org/>[39m[23m) to force all conflicts to become errors
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(bayestestR)}
+\FunctionTok{library}\NormalTok{(patchwork)}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Prepare the data}\label{prepare-the-data}
+
+Ensuring that your data is formatted correctly is essential for
+successfully using eDNAjoint. Let's first explore the structure of the
+goby data:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{data}\NormalTok{(goby\_data)}
+\FunctionTok{str}\NormalTok{(goby\_data)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## List of 4
+##  $ pcr_n   : num [1:39, 1:22] 6 6 6 6 6 6 6 6 6 6 ...
+##   ..- attr(*, "dimnames")=List of 2
+##   .. ..$ : NULL
+##   .. ..$ : chr [1:22] "1" "2" "3" "4" ...
+##  $ pcr_k   : num [1:39, 1:22] 0 0 0 0 6 0 0 0 0 5 ...
+##   ..- attr(*, "dimnames")=List of 2
+##   .. ..$ : NULL
+##   .. ..$ : chr [1:22] "1" "2" "3" "4" ...
+##  $ count   : int [1:39, 1:22] 0 0 0 0 0 0 0 0 0 1 ...
+##   ..- attr(*, "dimnames")=List of 2
+##   .. ..$ : NULL
+##   .. ..$ : chr [1:22] "1" "2" "3" "4" ...
+##  $ site_cov: num [1:39, 1:5] -0.711 -0.211 -1.16 -0.556 -0.988 ...
+##   ..- attr(*, "dimnames")=List of 2
+##   .. ..$ : NULL
+##   .. ..$ : chr [1:5] "Salinity" "Filter_time" "Other_fishes" "Hab_size" ...
+\end{verbatim}
+
+The input data is a list of matrices, where the rows in all matrices
+correspond to the number of sites.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{names}\NormalTok{(goby\_data)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "pcr_n"    "pcr_k"    "count"    "site_cov"
+\end{verbatim}
+
+\subsection{Count data}\label{count-data}
+
+Let's look at the dimensions of the count data:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{dim}\NormalTok{(goby\_data}\SpecialCharTok{$}\NormalTok{count)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 39 22
+\end{verbatim}
+
+Number of primary samples (sites) = 39 Maximum number of secondary
+samples (replicates per site) = 22
+
+These are the number of gobies in each seine sample, at each site.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{head}\NormalTok{(goby\_data}\SpecialCharTok{$}\NormalTok{count)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      1 2 3  4  5  6  7   8  9 10 11 12 13 14 15 16 17 18 19 20 21 22
+## [1,] 0 0 0  0  0  0  0   0  0  0  0 NA NA NA NA NA NA NA NA NA NA NA
+## [2,] 0 0 0  0  0  0  0   0  0  0  0 NA NA NA NA NA NA NA NA NA NA NA
+## [3,] 0 0 0  0  0  0  0   0  0  0  0 NA NA NA NA NA NA NA NA NA NA NA
+## [4,] 0 4 1  0  2  1 38 112  1 15 NA NA NA NA NA NA NA NA NA NA NA NA
+## [5,] 0 0 0  2  0  0  0   0  0  0  0  0  4  1  0  2  0  8 NA NA NA NA
+## [6,] 0 0 0 NA NA NA NA  NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+\end{verbatim}
+
+Because we are building these matrices based on the maximum dimensions,
+we fill in the matrix with NAs for samples that don't exist. For
+example, at site 1, there were only 11 seine replicates, so columns
+12-22 in row 1 are NA.
+
+Site 11 has the maximum number of replicate observations (22):
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{goby\_data}\SpecialCharTok{$}\NormalTok{count[}\DecValTok{11}\NormalTok{,]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18  19  20 
+##  58  44  54   7  27  49  56   7  27  15   0   0   4   2   5 217   0   0   0   0 
+##  21  22 
+##   0  14
+\end{verbatim}
+
+\subsection{eDNA (PCR) data}\label{edna-pcr-data}
+
+Next let's look at the PCR data. \texttt{pcr\_n} is the number of PCR
+replicates, per eDNA secondary sample (water sample), per site. These
+are the PCR ``attempts''.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{head}\NormalTok{(goby\_data}\SpecialCharTok{$}\NormalTok{pcr\_n)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      1 2 3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22
+## [1,] 6 6 6  6  6  6  6  6  6  6  6 NA NA NA NA NA NA NA NA NA NA NA
+## [2,] 6 6 6  6  6  6  6  6  6  6  6 NA NA NA NA NA NA NA NA NA NA NA
+## [3,] 6 6 6  6  6  6  6  6  6  6  6 NA NA NA NA NA NA NA NA NA NA NA
+## [4,] 6 6 6  6  6  6  6  6  6  6 NA NA NA NA NA NA NA NA NA NA NA NA
+## [5,] 6 6 6  6  6  6  6  6  6  6  6  6  6  6  6  6  6  6  6  6 NA NA
+## [6,] 6 6 6 NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+\end{verbatim}
+
+How many PCR replicates were there at site 4, water sample 6?
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{as.numeric}\NormalTok{(goby\_data}\SpecialCharTok{$}\NormalTok{pcr\_n[}\DecValTok{4}\NormalTok{, }\DecValTok{6}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 6
+\end{verbatim}
+
+Again, site 11 had the maximum number of water samples:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{goby\_data}\SpecialCharTok{$}\NormalTok{pcr\_n[}\DecValTok{11}\NormalTok{,]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 
+##  6  6  6  6  6  6  6  6  6  6  6  6  6  6  6  6  6  6  6  6  6  6
+\end{verbatim}
+
+\texttt{pcr\_k} is the number of PCR successes. Of the number of PCR
+replicates, how many were detections were there?
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{head}\NormalTok{(goby\_data}\SpecialCharTok{$}\NormalTok{pcr\_k)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      1 2 3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22
+## [1,] 0 0 0  0  0  0  0  0  0  0  0 NA NA NA NA NA NA NA NA NA NA NA
+## [2,] 0 0 0  0  0  0  0  0  0  0  0 NA NA NA NA NA NA NA NA NA NA NA
+## [3,] 0 0 0  0  0  0  0  0  0  0  0 NA NA NA NA NA NA NA NA NA NA NA
+## [4,] 0 6 6  4  6  5  4  6  5  3 NA NA NA NA NA NA NA NA NA NA NA NA
+## [5,] 6 6 4  6  6  6  5  4  2  2  0  6  5  5  6  6  6  5  5  4 NA NA
+## [6,] 0 0 0 NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+\end{verbatim}
+
+How many PCR detections (successes) were there at site 4, water sample
+6?
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{as.numeric}\NormalTok{(goby\_data}\SpecialCharTok{$}\NormalTok{pcr\_k[}\DecValTok{4}\NormalTok{, }\DecValTok{6}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 5
+\end{verbatim}
+
+A few checks to make sure the data is structured correctly:
+
+The locations of the NA should be the same in the \texttt{pcr\_k} and
+\texttt{pcr\_n} matrices.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{all}\NormalTok{(}\FunctionTok{which}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(goby\_data}\SpecialCharTok{$}\NormalTok{pcr\_k)) }\SpecialCharTok{==} \FunctionTok{which}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(goby\_data}\SpecialCharTok{$}\NormalTok{pcr\_n)))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] TRUE
+\end{verbatim}
+
+Both PCR and count data should have the same number of sites (i.e.,
+number of rows):
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{all.equal}\NormalTok{(}\FunctionTok{nrow}\NormalTok{(goby\_data}\SpecialCharTok{$}\NormalTok{pcr\_k), }\FunctionTok{nrow}\NormalTok{(goby\_data}\SpecialCharTok{$}\NormalTok{pcr\_n), }\FunctionTok{nrow}\NormalTok{(goby\_data}\SpecialCharTok{$}\NormalTok{count))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] TRUE
+\end{verbatim}
+
+\subsection{Site-level covariate data}\label{site-level-covariate-data}
+
+Site-level covariate data is totally optional! PCR and count data are
+the minimum.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{head}\NormalTok{(goby\_data}\SpecialCharTok{$}\NormalTok{site\_cov)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##        Salinity Filter_time Other_fishes   Hab_size Veg
+## [1,] -0.7114925       -1.17   -0.4738419 -0.2715560   0
+## [2,] -0.2109183       -1.24   -0.4738419 -0.2663009   0
+## [3,] -1.1602831       -1.29   -0.4738419 -0.2717707   0
+## [4,] -0.5561419        0.11    0.5479118 -0.2164312   1
+## [5,] -0.9876713       -0.70    0.2437353  4.9981956   1
+## [6,]  1.2562818       -0.55   -0.3512823 -0.2934710   0
+\end{verbatim}
+
+Notice that the continuous data is normalized:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{mean}\NormalTok{(goby\_data}\SpecialCharTok{$}\NormalTok{site\_cov[, }\StringTok{"Salinity"}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] -3.974359e-09
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sd}\NormalTok{(goby\_data}\SpecialCharTok{$}\NormalTok{site\_cov[, }\StringTok{"Salinity"}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 1
+\end{verbatim}
+
+\section{Fit the model}\label{fit-the-model}
+
+Now that we understand our data, let's fit the model using the function
+\texttt{joint\_model}. The key arguments of this function include:
+
+\begin{itemize}
+\item
+  \texttt{data}: list of pcr\_k, pcr\_n, count, and site\_cov matrices
+\item
+  \texttt{cov}: character vector of site-level covariates
+\item
+  \texttt{family}: probability distribution used to model the seine
+  count data. Options include a poisson, negative binomial, and gamma
+\item
+  \texttt{p10\_priors}: Beta distribution parameters for the prior on
+  the probability of false positive eDNA detection, p10. c(1,20) is the
+  default specification. More on this later.
+\item
+  \texttt{q}: logical value indicating the presence of multiple
+  traditional gear types.
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# run the joint model with two covariates}
+\NormalTok{goby\_fit\_cov1 }\OtherTok{\textless{}{-}} \FunctionTok{joint\_model}\NormalTok{(}
+  \AttributeTok{data =}\NormalTok{ goby\_data, }\CommentTok{\# data}
+  \AttributeTok{cov =} \FunctionTok{c}\NormalTok{(}\StringTok{"Filter\_time"}\NormalTok{, }\StringTok{"Salinity"}\NormalTok{), }\CommentTok{\# site{-}level covariates}
+  \AttributeTok{family =} \StringTok{"poisson"}\NormalTok{, }\CommentTok{\# distribution for traditional data}
+  \AttributeTok{p10\_priors =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{20}\NormalTok{), }\CommentTok{\# specify prior distribution for p10}
+  \AttributeTok{q =} \ConstantTok{FALSE}\NormalTok{, }\CommentTok{\# only one traditional gear type}
+  \AttributeTok{multicore =} \ConstantTok{TRUE} \CommentTok{\# run MCMC chains in parallel}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+There are many more arguments, including more to customize the MCMC
+algorithm, but these are the primary arguments.
+
+Now let's look at the return object:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{names}\NormalTok{(goby\_fit\_cov1)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "model" "inits"
+\end{verbatim}
+
+The first element of this list is the model, of class \texttt{stanfit}.
+This model object can be used with functions in the \texttt{rstan}
+package.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{class}\NormalTok{(goby\_fit\_cov1}\SpecialCharTok{$}\NormalTok{model)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "stanfit"
+## attr(,"package")
+## [1] "rstan"
+\end{verbatim}
+
+And the second element of the list are the initial values used to start
+the MCMC. And this will indicate the initial values used for each of the
+four MCMC chains.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{length}\NormalTok{(goby\_fit\_cov1}\SpecialCharTok{$}\NormalTok{inits)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 4
+\end{verbatim}
+
+\section{Model selection}\label{model-selection}
+
+In the first model, we used salinity and filter time as our site level
+covariates. Perhaps we want to see how this model compares to models
+that include other covariates.
+
+Here we will include the binary variable that indicates vegetation
+presence:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# fit a new model with one site{-}level covariate}
+\NormalTok{goby\_fit\_cov2 }\OtherTok{\textless{}{-}} \FunctionTok{joint\_model}\NormalTok{(}\AttributeTok{data =}\NormalTok{ goby\_data, }
+                             \AttributeTok{cov =} \StringTok{"Veg"}\NormalTok{,}
+                             \AttributeTok{family =} \StringTok{"poisson"}\NormalTok{, }
+                             \AttributeTok{p10\_priors =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{20}\NormalTok{),}
+                             \AttributeTok{q =} \ConstantTok{FALSE}\NormalTok{, }
+                             \AttributeTok{multicore =} \ConstantTok{TRUE}\NormalTok{,}
+                             \AttributeTok{verbose =} \ConstantTok{FALSE} \CommentTok{\# don\textquotesingle{}t print messages!}
+\NormalTok{                            )}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Refer to the eDNAjoint guide for visualization tips:  https://ednajoint.netlify.app/tips#visualization-tips
+\end{verbatim}
+
+And now we will use the \texttt{joint\_select} function to compare our
+two models. We will input our two models as a list:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# perform model selection}
+\FunctionTok{joint\_select}\NormalTok{(}\AttributeTok{model\_fits =} \FunctionTok{list}\NormalTok{(goby\_fit\_cov1}\SpecialCharTok{$}\NormalTok{model, goby\_fit\_cov2}\SpecialCharTok{$}\NormalTok{model))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##        elpd_diff se_diff
+## model1   0.0       0.0  
+## model2 -32.6      30.1
+\end{verbatim}
+
+This is performing model selection with leave-one-out cross validation
+and is a measure of how well a model predicts new, unseen data. A higher
+ELPD (Expected Log Predictive Density) value indicates better predictive
+performance, meaning the model is better at predicting new data.
+
+You could test this with all the covariates, but we will stick with
+model 1 (salinity and filter time) for now.
+
+\section{Summarize the posteriors}\label{summarize-the-posteriors}
+
+The model fit object contains our posterior samples, and we can use the
+\texttt{joint\_summarize} function to create summaries of the
+distributions.
+
+First let's look at the \texttt{p10} parameter:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{joint\_summarize}\NormalTok{(goby\_fit\_cov1}\SpecialCharTok{$}\NormalTok{model, }\AttributeTok{par =} \StringTok{"p10"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      mean se_mean    sd  2.5% 97.5%    n_eff Rhat
+## p10 0.003       0 0.001 0.001 0.007 15958.84    1
+\end{verbatim}
+
+Here, we see the mean, standard deviation, lower and upper bounds of the
+95\% credibility interval, the effective sample size, and Rhat.
+
+Let's plot this marginal posterior as a density plot:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ggplot}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{geom\_density}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =} \FunctionTok{as.matrix}\NormalTok{(goby\_fit\_cov1}\SpecialCharTok{$}\NormalTok{model)[, }\StringTok{"p10"}\NormalTok{]),}
+               \AttributeTok{fill =} \StringTok{"purple"}\NormalTok{, }\AttributeTok{alpha =} \FloatTok{0.4}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{x =} \StringTok{"p10 estimate"}\NormalTok{, }\AttributeTok{y =} \StringTok{"density"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Demo1_files/figure-latex/unnamed-chunk-24-1.pdf}}
+
+Let's plot the traceplot of \texttt{p10}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# get chains for param p10}
+\NormalTok{chain1\_p10 }\OtherTok{\textless{}{-}} \FunctionTok{as.array}\NormalTok{(goby\_fit\_cov1}\SpecialCharTok{$}\NormalTok{model)[, }\StringTok{"chain:1"}\NormalTok{, }\StringTok{"p10"}\NormalTok{]}
+\NormalTok{chain2\_p10 }\OtherTok{\textless{}{-}} \FunctionTok{as.array}\NormalTok{(goby\_fit\_cov1}\SpecialCharTok{$}\NormalTok{model)[, }\StringTok{"chain:2"}\NormalTok{, }\StringTok{"p10"}\NormalTok{]}
+\NormalTok{chain3\_p10 }\OtherTok{\textless{}{-}} \FunctionTok{as.array}\NormalTok{(goby\_fit\_cov1}\SpecialCharTok{$}\NormalTok{model)[, }\StringTok{"chain:3"}\NormalTok{, }\StringTok{"p10"}\NormalTok{]}
+\NormalTok{chain4\_p10 }\OtherTok{\textless{}{-}} \FunctionTok{as.array}\NormalTok{(goby\_fit\_cov1}\SpecialCharTok{$}\NormalTok{model)[, }\StringTok{"chain:4"}\NormalTok{, }\StringTok{"p10"}\NormalTok{]}
+
+\FunctionTok{ggplot}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{geom\_line}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =} \DecValTok{1}\SpecialCharTok{:}\FunctionTok{length}\NormalTok{(chain1\_p10), }\AttributeTok{y =}\NormalTok{ chain1\_p10),}
+            \AttributeTok{color =} \StringTok{"dodgerblue"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_line}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =} \DecValTok{1}\SpecialCharTok{:}\FunctionTok{length}\NormalTok{(chain2\_p10), }\AttributeTok{y =}\NormalTok{ chain2\_p10),}
+            \AttributeTok{color =} \StringTok{"firebrick"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_line}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =} \DecValTok{1}\SpecialCharTok{:}\FunctionTok{length}\NormalTok{(chain3\_p10), }\AttributeTok{y =}\NormalTok{ chain3\_p10),}
+            \AttributeTok{color =} \StringTok{"violet"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_line}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =} \DecValTok{1}\SpecialCharTok{:}\FunctionTok{length}\NormalTok{(chain4\_p10), }\AttributeTok{y =}\NormalTok{ chain4\_p10),}
+            \AttributeTok{color =} \StringTok{"goldenrod"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{x =} \StringTok{"iteration"}\NormalTok{, }\AttributeTok{y =} \StringTok{"p10 estimate"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Demo1_files/figure-latex/unnamed-chunk-25-1.pdf}}
+
+Now let's look at the summaries of \texttt{mu}, which is the expected
+catch rate at each site:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{joint\_summarize}\NormalTok{(goby\_fit\_cov1}\SpecialCharTok{$}\NormalTok{model, }\AttributeTok{par =} \StringTok{"mu"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##           mean se_mean    sd    2.5%   97.5%    n_eff Rhat
+## mu[1]    0.010   0.000 0.010   0.000   0.037 15362.94    1
+## mu[2]    0.008   0.000 0.008   0.000   0.030 14686.09    1
+## mu[3]    0.010   0.000 0.010   0.000   0.037 14239.15    1
+## mu[4]   16.696   0.009 1.272  14.267  19.314 20010.93    1
+## mu[5]    2.056   0.002 0.282   1.553   2.651 13561.08    1
+## mu[6]    0.035   0.000 0.038   0.001   0.136 14026.17    1
+## mu[7]    0.254   0.001 0.082   0.125   0.441 18553.03    1
+## mu[8]    0.651   0.005 0.673   0.015   2.518 15246.34    1
+## mu[9]    0.057   0.001 0.059   0.002   0.220 13277.94    1
+## mu[10]   1.161   0.001 0.179   0.845   1.547 14443.43    1
+## mu[11]  26.868   0.008 1.100  24.779  29.072 21311.11    1
+## mu[12]   0.016   0.000 0.017   0.000   0.060 15268.77    1
+## mu[13]   0.006   0.000 0.006   0.000   0.024 13806.36    1
+## mu[14]   0.055   0.000 0.056   0.001   0.208 13980.60    1
+## mu[15]   0.030   0.000 0.021   0.005   0.083 13546.27    1
+## mu[16]   0.027   0.000 0.022   0.002   0.084 14365.06    1
+## mu[17]   0.014   0.000 0.014   0.000   0.051 13743.58    1
+## mu[18]   0.029   0.000 0.029   0.001   0.108 15724.48    1
+## mu[19]   0.094   0.001 0.096   0.002   0.353 14761.51    1
+## mu[20]   0.267   0.001 0.099   0.112   0.491 17966.04    1
+## mu[21]   0.142   0.001 0.142   0.004   0.526 15334.63    1
+## mu[22]   0.413   0.001 0.184   0.135   0.841 18768.26    1
+## mu[23]  90.757   0.021 3.099  84.814  96.919 20823.27    1
+## mu[24]   1.678   0.002 0.316   1.131   2.368 18928.88    1
+## mu[25]  20.872   0.011 1.605  17.853  24.128 19496.94    1
+## mu[26]   1.825   0.002 0.305   1.283   2.469 16213.21    1
+## mu[27]   3.238   0.004 0.522   2.299   4.328 17844.60    1
+## mu[28]   8.109   0.006 0.759   6.693   9.682 18146.76    1
+## mu[29]   2.449   0.003 0.410   1.727   3.325 16412.54    1
+## mu[30]  15.106   0.016 2.154  11.185  19.609 18508.62    1
+## mu[31]  94.558   0.030 4.307  86.440 103.226 20836.56    1
+## mu[32]   0.028   0.000 0.028   0.001   0.104 15975.35    1
+## mu[33]   0.056   0.000 0.060   0.001   0.217 14452.03    1
+## mu[34]   0.401   0.002 0.217   0.091   0.932 15809.95    1
+## mu[35]   0.081   0.001 0.087   0.002   0.318 14889.43    1
+## mu[36]   0.007   0.000 0.007   0.000   0.026 12668.88    1
+## mu[37]   0.011   0.000 0.011   0.000   0.040 14454.33    1
+## mu[38] 170.551   0.043 5.839 159.230 182.155 18422.27    1
+## mu[39]   0.006   0.000 0.007   0.000   0.023 13181.25    1
+\end{verbatim}
+
+Now on to interpreting the site-level covariates:
+
+\texttt{beta} is the parameter in the model that scales the sensitivity
+of eDNA samples, relative to traditional samples, and it is site
+specific and a function of our covariates:
+
+\[
+\beta_i = \alpha_1 + \alpha_2 \times FilterTime_i + \alpha_3 \times Salinity_i
+\] As \texttt{beta} increases, the sensitivity of eDNA sampling
+decreases. So a positive regression coefficient would indicate an
+inverse relationship between the value of the covariate and the
+sensitivity of eDNA.
+
+So let's look at the marginal posterior summaries of \texttt{alpha}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{joint\_summarize}\NormalTok{(goby\_fit\_cov1}\SpecialCharTok{$}\NormalTok{model, }\AttributeTok{par =} \StringTok{"alpha"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##            mean se_mean    sd   2.5%  97.5%     n_eff Rhat
+## alpha[1]  0.542   0.001 0.099  0.343  0.737 10313.075    1
+## alpha[2]  1.022   0.001 0.121  0.777  1.252  9922.091    1
+## alpha[3] -0.350   0.001 0.108 -0.560 -0.136 11829.730    1
+\end{verbatim}
+
+\texttt{alpha{[}1{]}} is the regression intercept and indicates the
+sensitivity of eDNA at the \emph{average} site.
+
+\texttt{alpha{[}2{]}} is the regression coefficient for filter time.
+Since this is positive, this means that at sites where the filter time
+is longer, the sensitivity of eDNA is lower.
+
+\texttt{alpha{[}3{]}} is the regression coefficient for salinity. Since
+this is negative, this means that at sites with higher salinity, the
+sensitivity of eDNA is higher.
+
+And we can go a little farther than this and use the posterior samples
+and model structure to see the relationship between the value of the
+covariate and of a true eDNA detection.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# get posterior samples of site{-}level covariate coefficients (alpha)}
+\NormalTok{samples\_alpha }\OtherTok{\textless{}{-}} \FunctionTok{as.data.frame}\NormalTok{(rstan}\SpecialCharTok{::}\FunctionTok{extract}\NormalTok{(goby\_fit\_cov1}\SpecialCharTok{$}\NormalTok{model, }
+                                              \AttributeTok{pars =} \StringTok{"alpha"}\NormalTok{)}\SpecialCharTok{$}\NormalTok{alpha)}
+\FunctionTok{colnames}\NormalTok{(samples\_alpha) }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"alpha1"}\NormalTok{, }\StringTok{"alpha2"}\NormalTok{, }\StringTok{"alpha3"}\NormalTok{)}
+\CommentTok{\# calculate p11, given mu = 0.1 at a range of covariate values}
+\NormalTok{cov\_val }\OtherTok{\textless{}{-}} \FunctionTok{seq}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\FloatTok{0.05}\NormalTok{)}
+\NormalTok{mu }\OtherTok{\textless{}{-}} \FloatTok{0.1}
+\CommentTok{\# filter time}
+\NormalTok{p11\_filtertime }\OtherTok{\textless{}{-}} \FunctionTok{as.data.frame}\NormalTok{(}\FunctionTok{matrix}\NormalTok{(}\ConstantTok{NA}\NormalTok{, }\AttributeTok{nrow =} \FunctionTok{length}\NormalTok{(cov\_val), }\AttributeTok{ncol =} \DecValTok{4}\NormalTok{))}
+\FunctionTok{colnames}\NormalTok{(p11\_filtertime) }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"filtertime\_z"}\NormalTok{, }\StringTok{"p11\_mean"}\NormalTok{, }\StringTok{"p11\_low"}\NormalTok{, }\StringTok{"p11\_high"}\NormalTok{)}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \FunctionTok{seq\_along}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\FunctionTok{length}\NormalTok{(cov\_val))) \{}
+\NormalTok{  beta }\OtherTok{\textless{}{-}} \FunctionTok{as.matrix}\NormalTok{(samples\_alpha) }\SpecialCharTok{\%*\%} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, cov\_val[i], }\DecValTok{0}\NormalTok{)}
+\NormalTok{  p11 }\OtherTok{\textless{}{-}}\NormalTok{ mu }\SpecialCharTok{/}\NormalTok{ (mu }\SpecialCharTok{+} \FunctionTok{exp}\NormalTok{(beta))}
+\NormalTok{  p11\_filtertime[i, ] }\OtherTok{\textless{}{-}} \FunctionTok{as.vector}\NormalTok{(}\FunctionTok{c}\NormalTok{(cov\_val[i], }\FunctionTok{mean}\NormalTok{(p11),}
+  \FunctionTok{ci}\NormalTok{(p11, }\AttributeTok{method =} \StringTok{"HDI"}\NormalTok{)[}\DecValTok{2}\SpecialCharTok{:}\DecValTok{3}\NormalTok{]))}
+\NormalTok{\}}
+
+\CommentTok{\# salinity}
+\NormalTok{p11\_salinity }\OtherTok{\textless{}{-}} \FunctionTok{as.data.frame}\NormalTok{(}\FunctionTok{matrix}\NormalTok{(}\ConstantTok{NA}\NormalTok{, }\AttributeTok{nrow =} \FunctionTok{length}\NormalTok{(cov\_val), }\AttributeTok{ncol =} \DecValTok{4}\NormalTok{))}
+\FunctionTok{colnames}\NormalTok{(p11\_salinity) }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"salinity\_z"}\NormalTok{, }\StringTok{"p11\_mean"}\NormalTok{, }\StringTok{"p11\_low"}\NormalTok{, }\StringTok{"p11\_high"}\NormalTok{)}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \FunctionTok{seq\_along}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\FunctionTok{length}\NormalTok{(cov\_val))) \{}
+\NormalTok{  beta }\OtherTok{\textless{}{-}} \FunctionTok{as.matrix}\NormalTok{(samples\_alpha) }\SpecialCharTok{\%*\%} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{, cov\_val[i])}
+\NormalTok{  p11 }\OtherTok{\textless{}{-}}\NormalTok{ mu }\SpecialCharTok{/}\NormalTok{ (mu }\SpecialCharTok{+} \FunctionTok{exp}\NormalTok{(beta))}
+\NormalTok{  p11\_salinity[i, ] }\OtherTok{\textless{}{-}} \FunctionTok{as.vector}\NormalTok{(}\FunctionTok{c}\NormalTok{(cov\_val[i], }\FunctionTok{mean}\NormalTok{(p11),}
+  \FunctionTok{ci}\NormalTok{(p11, }\AttributeTok{method =} \StringTok{"HDI"}\NormalTok{)[}\DecValTok{2}\SpecialCharTok{:}\DecValTok{3}\NormalTok{]))}
+\NormalTok{\}}
+\CommentTok{\# plot}
+\NormalTok{filtertime\_plot }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ p11\_filtertime) }\SpecialCharTok{+}
+  \FunctionTok{geom\_ribbon}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ filtertime\_z, }
+                  \AttributeTok{ymin =}\NormalTok{ p11\_low, }\AttributeTok{ymax =}\NormalTok{ p11\_high), }\AttributeTok{fill =} \StringTok{"grey70"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_line}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ filtertime\_z, }\AttributeTok{y =}\NormalTok{ p11\_mean)) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{x =} \StringTok{"filter time (normalized)"}\NormalTok{, }\AttributeTok{y =} \StringTok{"p11"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{ggtitle}\NormalTok{(}\StringTok{"A."}\NormalTok{)}
+
+\NormalTok{salinity\_plot }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ p11\_salinity) }\SpecialCharTok{+}
+  \FunctionTok{geom\_ribbon}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ salinity\_z,}
+                  \AttributeTok{ymin =}\NormalTok{ p11\_low, }\AttributeTok{ymax =}\NormalTok{ p11\_high), }\AttributeTok{fill =} \StringTok{"grey70"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_line}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ salinity\_z, }\AttributeTok{y =}\NormalTok{ p11\_mean)) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{x =} \StringTok{"salinity (normalized)"}\NormalTok{, }\AttributeTok{y =} \StringTok{"p11"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{ggtitle}\NormalTok{(}\StringTok{"B."}\NormalTok{)}
+
+\NormalTok{filtertime\_plot }\SpecialCharTok{+}\NormalTok{ salinity\_plot }\SpecialCharTok{+} \FunctionTok{plot\_layout}\NormalTok{(}\AttributeTok{nrow =} \DecValTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{Demo1_files/figure-latex/unnamed-chunk-28-1.pdf}}
+
+\section{Compare detection rates}\label{compare-detection-rates}
+
+\section{Priors}\label{priors}
+
+\end{document}

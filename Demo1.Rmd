@@ -1,0 +1,312 @@
+---
+title: 'Demo 1: Endangered tidewater gobies'
+output: pdf_document
+---
+
+First we will load the package:
+
+```{r, warning = FALSE}
+# load the package
+library(eDNAjoint)
+library(tidyverse)
+library(bayestestR)
+library(patchwork)
+```
+
+# Prepare the data
+
+Ensuring that your data is formatted correctly is essential for successfully using eDNAjoint. Let’s first explore the structure of the goby data:
+
+```{r}
+data(goby_data)
+str(goby_data)
+```
+
+The input data is a list of matrices, where the rows in all matrices correspond to the number of sites.
+
+```{r}
+names(goby_data)
+```
+
+## Count data
+
+Let's look at the dimensions of the count data:
+
+```{r}
+dim(goby_data$count)
+```
+Number of primary samples (sites) = 39
+Maximum number of secondary samples (replicates per site) = 22
+
+These are the number of gobies in each seine sample, at each site.
+
+```{r}
+head(goby_data$count)
+```
+Because we are building these matrices based on the maximum dimensions, we fill in the matrix with NAs for samples that don't exist. For example, at site 1, there were only 11 seine replicates, so columns 12-22 in row 1 are NA.
+
+Site 11 has the maximum number of replicate observations (22):
+
+```{r}
+goby_data$count[11,]
+```
+
+## eDNA (PCR) data
+
+Next let's look at the PCR data. `pcr_n` is the number of PCR replicates, per eDNA secondary sample (water sample), per site. These are the PCR "attempts".
+
+```{r}
+head(goby_data$pcr_n)
+```
+
+How many PCR replicates were there at site 4, water sample 6?
+
+```{r}
+as.numeric(goby_data$pcr_n[4, 6])
+```
+
+Again, site 11 had the maximum number of water samples:
+
+```{r}
+goby_data$pcr_n[11,]
+```
+`pcr_k` is the number of PCR successes. Of the number of PCR replicates, how many were detections were there?
+
+```{r}
+head(goby_data$pcr_k)
+```
+
+How many PCR detections (successes) were there at site 4, water sample 6?
+
+```{r}
+as.numeric(goby_data$pcr_k[4, 6])
+```
+
+A few checks to make sure the data is structured correctly:
+
+The locations of the NA should be the same in the `pcr_k` and `pcr_n` matrices.
+
+```{r}
+all(which(is.na(goby_data$pcr_k)) == which(is.na(goby_data$pcr_n)))
+```
+
+Both PCR and count data should have the same number of sites (i.e., number of rows):
+
+```{r}
+all.equal(nrow(goby_data$pcr_k), nrow(goby_data$pcr_n), nrow(goby_data$count))
+```
+
+## Site-level covariate data
+
+Site-level covariate data is totally optional! PCR and count data are the minimum.
+
+```{r}
+head(goby_data$site_cov)
+```
+Notice that the continuous data is normalized:
+
+```{r}
+mean(goby_data$site_cov[, "Salinity"])
+```
+
+```{r}
+sd(goby_data$site_cov[, "Salinity"])
+```
+
+# Fit the model
+
+Now that we understand our data, let’s fit the model using the function `joint_model`. The key arguments of this function include:
+
+ * `data`: list of pcr_k, pcr_n, count, and site_cov matrices
+
+ * `cov`: character vector of site-level covariates 
+ 
+ * `family`: probability distribution used to model the seine count data. Options include a poisson, negative binomial, and gamma 
+ 
+ * `p10_priors`: Beta distribution parameters for the prior on the probability of false positive eDNA detection, p10. c(1,20) is the default specification. More on this later.
+ 
+ * `q`: logical value indicating the presence of multiple traditional gear types.
+ 
+```{r}
+# run the joint model with two covariates
+goby_fit_cov1 <- joint_model(
+  data = goby_data, # data
+  cov = c("Filter_time", "Salinity"), # site-level covariates
+  family = "poisson", # distribution for traditional data
+  p10_priors = c(1, 20), # specify prior distribution for p10
+  q = FALSE, # only one traditional gear type
+  multicore = TRUE # run MCMC chains in parallel
+)
+```
+
+There are many more arguments, including more to customize the MCMC algorithm, but these are the primary arguments.
+
+Now let's look at the return object:
+
+```{r}
+names(goby_fit_cov1)
+```
+The first element of this list is the model, of class `stanfit`. This model object can be used with functions in the `rstan` package.
+
+```{r}
+class(goby_fit_cov1$model)
+```
+
+And the second element of the list are the initial values used to start the MCMC. And this will indicate the initial values used for each of the four MCMC chains.
+
+```{r}
+length(goby_fit_cov1$inits)
+```
+# Model selection
+
+In the first model, we used salinity and filter time as our site level covariates. Perhaps we want to see how this model compares to models that include other covariates.
+
+Here we will include the binary variable that indicates vegetation presence:
+
+```{r}
+# fit a new model with one site-level covariate
+goby_fit_cov2 <- joint_model(data = goby_data, 
+                             cov = "Veg",
+                             family = "poisson", 
+                             p10_priors = c(1, 20),
+                             q = FALSE, 
+                             multicore = TRUE,
+                             verbose = FALSE # don't print messages!
+                            )
+```
+And now we will use the `joint_select` function to compare our two models. We will input our two models as a list:
+
+```{r, message = FALSE, warning = FALSE}
+# perform model selection
+joint_select(model_fits = list(goby_fit_cov1$model, goby_fit_cov2$model))
+```
+
+This is performing model selection with leave-one-out cross validation and is a measure of how well a model predicts new, unseen data. A higher ELPD (Expected Log Predictive Density) value indicates better predictive performance, meaning the model is better at predicting new data.
+
+You could test this with all the covariates, but we will stick with model 1 (salinity and filter time) for now.
+
+# Summarize the posteriors
+
+The model fit object contains our posterior samples, and we can use the `joint_summarize` function to create summaries of the distributions.
+
+First let's look at the `p10` parameter:
+
+```{r}
+joint_summarize(goby_fit_cov1$model, par = "p10")
+```
+Here, we see the mean, standard deviation, lower and upper bounds of the 95% credibility interval, the effective sample size, and Rhat.
+
+Let's plot this marginal posterior as a density plot:
+
+```{r}
+ggplot() +
+  geom_density(aes(x = as.matrix(goby_fit_cov1$model)[, "p10"]),
+               fill = "purple", alpha = 0.4) +
+  labs(x = "p10 estimate", y = "density") +
+  theme_minimal()
+```
+
+Let's plot the traceplot of `p10`:
+
+```{r}
+# get chains for param p10
+chain1_p10 <- as.array(goby_fit_cov1$model)[, "chain:1", "p10"]
+chain2_p10 <- as.array(goby_fit_cov1$model)[, "chain:2", "p10"]
+chain3_p10 <- as.array(goby_fit_cov1$model)[, "chain:3", "p10"]
+chain4_p10 <- as.array(goby_fit_cov1$model)[, "chain:4", "p10"]
+
+ggplot() +
+  geom_line(aes(x = 1:length(chain1_p10), y = chain1_p10),
+            color = "dodgerblue") +
+  geom_line(aes(x = 1:length(chain2_p10), y = chain2_p10),
+            color = "firebrick") +
+  geom_line(aes(x = 1:length(chain3_p10), y = chain3_p10),
+            color = "violet") +
+  geom_line(aes(x = 1:length(chain4_p10), y = chain4_p10),
+            color = "goldenrod") +
+  labs(x = "iteration", y = "p10 estimate") +
+  theme_minimal()
+```
+
+Now let's look at the summaries of `mu`, which is the expected catch rate at each site:
+
+```{r}
+joint_summarize(goby_fit_cov1$model, par = "mu")
+```
+
+Now on to interpreting the site-level covariates:
+
+`beta` is the parameter in the model that scales the sensitivity of eDNA samples, relative to traditional samples, and it is site specific and a function of our covariates:
+
+$$
+\beta_i = \alpha_1 + \alpha_2 \times FilterTime_i + \alpha_3 \times Salinity_i
+$$
+As `beta` increases, the sensitivity of eDNA sampling decreases. So a positive regression coefficient would indicate an inverse relationship between the value of the covariate and the sensitivity of eDNA.
+
+So let's look at the marginal posterior summaries of `alpha`:
+
+```{r}
+joint_summarize(goby_fit_cov1$model, par = "alpha")
+```
+`alpha[1]` is the regression intercept and indicates the sensitivity of eDNA at the *average* site.
+
+`alpha[2]` is the regression coefficient for filter time. Since this is positive, this means that at sites where the filter time is longer, the sensitivity of eDNA is lower.
+
+`alpha[3]` is the regression coefficient for salinity. Since this is negative, this means that at sites with higher salinity, the sensitivity of eDNA is higher.
+
+And we can go a little farther than this and use the posterior samples and model structure to see the relationship between the value of the covariate and of a true eDNA detection. 
+
+```{r}
+# get posterior samples of site-level covariate coefficients (alpha)
+samples_alpha <- as.data.frame(rstan::extract(goby_fit_cov1$model, 
+                                              pars = "alpha")$alpha)
+colnames(samples_alpha) <- c("alpha1", "alpha2", "alpha3")
+# calculate p11, given mu = 0.1 at a range of covariate values
+cov_val <- seq(-1, 1, 0.05)
+mu <- 0.1
+# filter time
+p11_filtertime <- as.data.frame(matrix(NA, nrow = length(cov_val), ncol = 4))
+colnames(p11_filtertime) <- c("filtertime_z", "p11_mean", "p11_low", "p11_high")
+for (i in seq_along(1:length(cov_val))) {
+  beta <- as.matrix(samples_alpha) %*% c(1, cov_val[i], 0)
+  p11 <- mu / (mu + exp(beta))
+  p11_filtertime[i, ] <- as.vector(c(cov_val[i], mean(p11),
+  ci(p11, method = "HDI")[2:3]))
+}
+
+# salinity
+p11_salinity <- as.data.frame(matrix(NA, nrow = length(cov_val), ncol = 4))
+colnames(p11_salinity) <- c("salinity_z", "p11_mean", "p11_low", "p11_high")
+for (i in seq_along(1:length(cov_val))) {
+  beta <- as.matrix(samples_alpha) %*% c(1, 0, cov_val[i])
+  p11 <- mu / (mu + exp(beta))
+  p11_salinity[i, ] <- as.vector(c(cov_val[i], mean(p11),
+  ci(p11, method = "HDI")[2:3]))
+}
+# plot
+filtertime_plot <- ggplot(data = p11_filtertime) +
+  geom_ribbon(aes(x = filtertime_z, 
+                  ymin = p11_low, ymax = p11_high), fill = "grey70") +
+  geom_line(aes(x = filtertime_z, y = p11_mean)) +
+  labs(x = "filter time (normalized)", y = "p11") +
+  theme_minimal() +
+  ggtitle("A.")
+
+salinity_plot <- ggplot(data = p11_salinity) +
+  geom_ribbon(aes(x = salinity_z,
+                  ymin = p11_low, ymax = p11_high), fill = "grey70") +
+  geom_line(aes(x = salinity_z, y = p11_mean)) +
+  labs(x = "salinity (normalized)", y = "p11") +
+  theme_minimal() +
+  ggtitle("B.")
+
+filtertime_plot + salinity_plot + plot_layout(nrow = 1)
+```
+
+
+# Compare detection rates
+
+# Priors
+
+
+
