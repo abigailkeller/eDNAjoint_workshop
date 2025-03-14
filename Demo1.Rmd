@@ -335,7 +335,7 @@ detection_plot(goby_fit_cov1$model,
 
 When we first fit our model, we used the default prior distribution for $p10$, the probability of a false positive eDNA detection:
 
-```{r}
+```{r, eval = FALSE}
 # run the joint model with two covariates
 goby_fit_cov1 <- joint_model(
   data = goby_data,
@@ -385,7 +385,7 @@ If the posterior is not sensitive to the prior, this means that the posterior is
 
 So we could run our model again with different priors:
 
-```{r}
+```{r, message = FALSE, warning = FALSE}
 fit_prior2 <- joint_model(data = goby_data, family = "poisson",
                           cov = c("Filter_time", "Salinity"),
                           p10_priors = c(1, 15), # new prior
@@ -393,7 +393,7 @@ fit_prior2 <- joint_model(data = goby_data, family = "poisson",
                           multicore = TRUE)
 ```
 
-```{r}
+```{r, message = FALSE, warning = FALSE}
 fit_prior3 <- joint_model(data = goby_data, family = "poisson",
                           cov = c("Filter_time", "Salinity"),
                           p10_priors = c(1, 25), # new prior
