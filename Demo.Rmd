@@ -38,6 +38,7 @@ Let's look at the dimensions of the count data:
 ```{r}
 dim(goby_data$count)
 ```
+
 Number of primary samples (sites) = 39
 Maximum number of secondary samples (replicates per site) = 22
 
@@ -73,6 +74,7 @@ Again, site 11 had the maximum number of water samples:
 ```{r}
 goby_data$pcr_n[11,]
 ```
+
 `pcr_k` is the number of PCR successes. Of the number of PCR replicates, how many were detections were there?
 
 ```{r}
@@ -150,6 +152,7 @@ Now let's look at the return object:
 ```{r}
 names(goby_fit_cov1)
 ```
+
 The first element of this list is the model, of class `stanfit`. This model object can be used with functions in the `rstan` package.
 
 ```{r}
@@ -191,7 +194,7 @@ This is performing model selection with leave-one-out cross validation and is a 
 
 You could test this with all the covariates, but we will stick with model 1 (salinity and filter time) for now.
 
-# Summarize the posteriors
+# Summarize the posterior
 
 The model fit object contains our posterior samples, and we can use the `joint_summarize` function to create summaries of the distributions.
 
@@ -265,7 +268,7 @@ joint_summarize(goby_fit_cov1$model, par = "alpha")
 
 # Compare detection rates
 
-To compare the relative sensitivity of eDNA and traditional sampling, we can use `detection_calculate()` to find the units of survey effort necessary to detect presence of the species. 
+To compare the relative sensitivity of eDNA and traditional sampling, we can use `detection_plot()` to find the units of survey effort necessary to detect presence of the species. 
 
 Here, detecting presence refers to producing at least one true positive eDNA detection or catching at least one individual in a traditional survey.
 
@@ -279,10 +282,10 @@ $$
 $$
 
 ```{r}
-detection_calculate(goby_fit_cov1$model, # model fit
-                    mu = c(0.1, 0.5, 1), # expected catch rate
-                    cov_val = c(0, 0), # mean covariate values
-                    probability = 0.9) # probability of detection
+detection_plot(goby_fit_cov1$model, 
+               mu_min = 0.1, mu_max = 1, # min and max mu
+               cov_val = c(0, 0), # mean covariate values
+               probability = 0.9)
 ```
 
 How does this change if we do not calculate for a site with mean covariate values?
@@ -294,10 +297,10 @@ $$
 $$
 
 ```{r}
-detection_calculate(goby_fit_cov1$model, 
-                    mu = c(0.1, 0.5, 1),
-                    cov_val = c(0.5, 0), # filter time 0.5 z-scores above the mean
-                    probability = 0.9)
+detection_plot(goby_fit_cov1$model, 
+               mu_min = 0.1, mu_max = 1, # min and max mu
+               cov_val = c(0.5, 0), # high filter time
+               probability = 0.9)
 ```
 
 Now let's do the same for salinity:
@@ -307,29 +310,13 @@ $$
 $$
 
 ```{r}
-detection_calculate(goby_fit_cov1$model, 
-                    mu = c(0.1, 0.5, 1),
-                    cov_val = c(0, 0.5), # salinity 0.5 z-scores above the mean
-                    probability = 0.9)
-```
-
-We can plot these comparisons as well with `detection_plot()`:
-
-```{r}
 detection_plot(goby_fit_cov1$model, 
                mu_min = 0.1, mu_max = 1, # min and max mu
-               cov_val = c(0, 0), # mean covariate values
+               cov_val = c(0, 0.5), # high salinity
                probability = 0.9)
 ```
 
-And now plot for a site with filter time 0.5 z-scores above the mean:
 
-```{r}
-detection_plot(goby_fit_cov1$model, 
-               mu_min = 0.1, mu_max = 1, # min and max mu
-               cov_val = c(0.5, 0), # high filter time
-               probability = 0.9)
-```
 
 # Prior sensitivity analysis
 
