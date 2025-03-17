@@ -1,5 +1,5 @@
 ---
-title: 'Demo 1: Endangered tidewater gobies'
+title: 'eDNAjoint demo: Endangered tidewater gobies'
 output: pdf_document
 ---
 
