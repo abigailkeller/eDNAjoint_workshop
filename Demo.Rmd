@@ -60,7 +60,7 @@ goby_data$count[11,]
 Next let's look at the PCR data. `pcr_n` is the number of PCR replicates, per eDNA secondary sample (water sample), per site. These are the PCR "attempts".
 
 ```{r}
-head(goby_data$pcr_n)
+tail(goby_data$pcr_n)
 ```
 
 How many PCR replicates were there at site 4, water sample 6?
@@ -69,16 +69,10 @@ How many PCR replicates were there at site 4, water sample 6?
 as.numeric(goby_data$pcr_n[4, 6])
 ```
 
-Again, site 11 had the maximum number of water samples:
-
-```{r}
-goby_data$pcr_n[11,]
-```
-
 `pcr_k` is the number of PCR successes. Of the number of PCR replicates, how many were detections were there?
 
 ```{r}
-head(goby_data$pcr_k)
+tail(goby_data$pcr_k)
 ```
 
 How many PCR detections (successes) were there at site 4, water sample 6?
