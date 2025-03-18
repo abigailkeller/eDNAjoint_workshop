@@ -1,5 +1,5 @@
 ---
-title: 'eDNAjoint demo: Endangered tidewater gobies'
+title: 'Demo 1: Endangered tidewater gobies'
 output: pdf_document
 ---
 
@@ -439,3 +439,8 @@ posterior_plot <- ggplot() +
 
 prior_plot + posterior_plot + plot_layout(ncol = 2)
 ```
+
+```{r dh-figure, echo=FALSE}
+knitr::include_graphics("prior_sensitivity.png")
+```
+
